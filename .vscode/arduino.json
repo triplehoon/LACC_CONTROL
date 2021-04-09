@@ -1,0 +1,7 @@
+{
+    "sketch": "LACC_control_code.ino",
+    "configuration": "cpu=atmega2560",
+    "board": "arduino:avr:mega",
+    "port": "COM4"    
+    
+}
