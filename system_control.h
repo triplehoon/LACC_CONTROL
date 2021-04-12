@@ -12,7 +12,7 @@
 #define HV_VMON_ANAL (1)
 #define ADC_RESOLUTION (0.0049)
 #define ADC_To_HV (200)
-#define ADC_To_CURR (2)
+#define ADC_To_CURR (0.002)
 
 #include <Arduino.h>
 #include <Wire.h>
@@ -46,4 +46,3 @@ public:
     SystemControl();
     
 };
-

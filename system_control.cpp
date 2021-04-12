@@ -34,10 +34,10 @@ void SystemControl::WaitForCommand()
     while (true) {
         if (Serial.available() > 0) {
             s_StringBuffer[i] = (char)Serial.read();
-            Serial.write(s_StringBuffer[i]);
+            //Serial.write(s_StringBuffer[i]);
             if (s_StringBuffer[i] == '\n') {
                 s_StringBuffer[i] = '\0';
-                Serial.write("check\n");
+                //Serial.write("check\n");
                 break;
             }
             ++i;
@@ -140,15 +140,15 @@ void SystemControl::SerialWriteAllCurrentValues()
     double hvCurr = GetHVModuleCurrent();
     double batVolt = GetBatteryVoltage();
     Serial.print("hvvolt:");
-    Serial.print(hvVolt, 2);
+    Serial.print(hvVolt, 4);
     Serial.print(",");
 
     Serial.print("hvcurr:");
-    Serial.print(hvCurr, 2);
+    Serial.print(hvCurr, 4);
     Serial.print(",");
 
     Serial.print("batvolt:");
-    Serial.print(batVolt, 2);
+    Serial.print(batVolt, 4);
     Serial.print(",");
 
     Serial.print("fpga:");
@@ -215,7 +215,6 @@ void SystemControl::SerialWriteTurnOnHV(int segmentMillisecond)
     
     
     double segement_by_volt = 4092 / 1000;
-    Serial.println("start");
     for (int i = 0; i < 1000; ++i) {
         dac.setVoltage(round(i * segement_by_volt));
         Serial.println(GetHVModuleVoltage());
@@ -255,7 +254,6 @@ void SystemControl::SerialWriteTurnOffHV(int segmentMillisecond)
     trun_on_off_LED(3, true);
     trun_on_off_LED(2, true);
     trun_on_off_LED(1, true);
-    Serial.println("start");
     for (int i = 0; i < 1000; ++i) {
         dac.setVoltage(round((1000 - i) * segement_by_volt));
         Serial.println(GetHVModuleVoltage());
@@ -282,4 +280,3 @@ void SystemControl::SerialWriteTurnOffHV(int segmentMillisecond)
 
     Serial.println("done");
 }
-
