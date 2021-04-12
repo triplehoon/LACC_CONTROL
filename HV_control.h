@@ -4,7 +4,7 @@
 #define HV_AMON_ANAL (0)
 #define HV_VMON_ANAL (1)
 #define ADC_RESOLUTION (0.0049)
-#define ADC_To_
+#define ADC_To_HV (200)
 
 #include <Arduino.h>
 #include <Wire.h>

@@ -16,6 +16,6 @@ void setup(void)
 		blink_LED(3, 50);
 		blink_LED(2, 50);
 		blink_LED(1, 50);
-
+		sysCon->WaitForCommand();
 	}
 }
