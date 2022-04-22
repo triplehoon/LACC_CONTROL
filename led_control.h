@@ -1,11 +1,11 @@
 #ifndef LED_CONTROL_H
 #define LED_CONTROL_H
 
-#define LED_1 (3)
-#define LED_2 (4)
+#define LED_1 (7)
+#define LED_2 (6)
 #define LED_3 (5)
-#define LED_4 (6)
-#define LED_5 (7)
+#define LED_4 (4)
+#define LED_5 (3)
 
 #include <stdbool.h>
 #include <Arduino.h>

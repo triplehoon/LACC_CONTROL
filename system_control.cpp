@@ -1,11 +1,17 @@
 #include "system_control.h"
+#include <SoftwareSerial.h>
 
+
+int bt_Tx=0;  //우노의 Tx핀 Bluetooth의Rx와 연결
+int bt_Rx=1;  //우노의 Rx핀 Bluetooth의Tx와 연결
+SoftwareSerial bt(bt_Rx, bt_Tx);
 
 SystemControl::SystemControl(){
     Serial.begin(9600);
     setting_LED_pinmode();
-    dac.begin(0x60);
+    dac.begin(0x62);
 
+    Serial.println(ADC_RESOLUTION,10);
     for (int i = 0; i < STRING_BUFFER_SIZE; ++i) {
         s_StringBuffer[i] = '\0';
     }
@@ -26,6 +32,9 @@ SystemControl::SystemControl(){
     } else {
         IsHVOn = false;
     }
+    mLcdControl.init();   
+    mLcdControl.print("hello, world!");
+    mLcdControl.display();
 }
 
 void SystemControl::WaitForCommand()
@@ -150,12 +159,31 @@ void SystemControl::SerialWriteAllCurrentValues()
     Serial.print("batvolt:");
     Serial.print(batVolt, 4);
     Serial.print(",");
+    char buf[128];   
 
+    dtostrf(hvVolt, 4, 0, buf);   
+       mLcdControl.setCursor(0,1);
+       mLcdControl.print("HV: ");
+       mLcdControl.print(buf);
+       mLcdControl.print(" [V]         ");
     Serial.print("fpga:");
+    float batPercent = (batVolt - 9.2) / (13.6 - 9.2) * 100;
+    if (batPercent < 0) {
+      batPercent = 0;
+    }
+    dtostrf(batPercent, 3, 0, buf);   
     if (IsFPGAOn) {
         Serial.print("on");
+        mLcdControl.setCursor(0,0);
+        mLcdControl.print("FPGA: ON   ");
+        mLcdControl.print(buf);
+        mLcdControl.print(" %");
     } else {
         Serial.print("off");
+        mLcdControl.setCursor(0,0);
+        mLcdControl.print("FPGA: OFF  ");
+        mLcdControl.print(buf);
+        mLcdControl.print(" %");
     }
     Serial.print(",");
     for (int i = 0; i < 6; ++i) {
@@ -170,6 +198,7 @@ void SystemControl::SerialWriteAllCurrentValues()
         Serial.print(",");
     }
     Serial.println("");
+
 }
 double SystemControl::GetBatteryVoltage()
 {   
@@ -179,7 +208,7 @@ double SystemControl::GetBatteryVoltage()
 double SystemControl::GetHVModuleVoltage()
 {
     int volt = analogRead(HV_VMON_ANAL);
-    return volt * ADC_RESOLUTION * ADC_To_HV;
+    return (double)volt * ADC_RESOLUTION * ADC_To_HV;
 }
 double SystemControl::GetHVModuleCurrent()
 {
@@ -215,22 +244,22 @@ void SystemControl::SerialWriteTurnOnHV(int segmentMillisecond)
     
     
     double segement_by_volt = 4092 / 1000;
-    for (int i = 0; i < 1000; ++i) {
+    for (int i = 0; i < 900; ++i) {
         dac.setVoltage(round(i * segement_by_volt));
         Serial.println(GetHVModuleVoltage());
-        if (GetHVModuleVoltage() > 200) {
+        if (GetHVModuleVoltage() > 150) {
             trun_on_off_LED(5, true);
         }
-        if (GetHVModuleVoltage() > 400) {
+        if (GetHVModuleVoltage() > 250) {
             trun_on_off_LED(4, true);
         }
-        if (GetHVModuleVoltage() > 600) {
+        if (GetHVModuleVoltage() > 450) {
             trun_on_off_LED(3, true);
         }
-        if (GetHVModuleVoltage() > 800) {
+        if (GetHVModuleVoltage() > 650) {
             trun_on_off_LED(2, true);
         }
-        if (GetHVModuleVoltage() > 950) {
+        if (GetHVModuleVoltage() > 850) {
             trun_on_off_LED(1, true);
         }
        
@@ -254,8 +283,8 @@ void SystemControl::SerialWriteTurnOffHV(int segmentMillisecond)
     trun_on_off_LED(3, true);
     trun_on_off_LED(2, true);
     trun_on_off_LED(1, true);
-    for (int i = 0; i < 1000; ++i) {
-        dac.setVoltage(round((1000 - i) * segement_by_volt));
+    for (int i = 0; i < 900; ++i) {
+        dac.setVoltage(round((900 - i) * segement_by_volt));
         Serial.println(GetHVModuleVoltage());
 
         if (GetHVModuleVoltage() < 100){

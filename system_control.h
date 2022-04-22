@@ -10,7 +10,7 @@
 #define STRING_BUFFER_SIZE (1024)
 #define HV_AMON_ANAL (0)
 #define HV_VMON_ANAL (1)
-#define ADC_RESOLUTION (0.0049)
+#define ADC_RESOLUTION (4.91 / 1024)
 #define ADC_To_HV (200)
 #define ADC_To_CURR (0.002)
 
@@ -19,6 +19,7 @@
 #include "MCP4725.h"
 #include "HV_control.h"
 #include "led_control.h"
+#include "DFRobot_LCD.h"
 
 static char s_StringBuffer[STRING_BUFFER_SIZE];
 
@@ -41,6 +42,9 @@ private:
     void SerialWriteTurnOnHV(int segmentMillisecond);
     void SerialWriteTurnOffHV(int segmentMillisecond);
     bool IsHVOn;
+
+    DFRobot_LCD mLcdControl  = DFRobot_LCD(16, 2); 
+
 public:
     void WaitForCommand();
     SystemControl();
